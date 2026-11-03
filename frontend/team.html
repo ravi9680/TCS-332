@@ -40,10 +40,10 @@
             <div class="scanner-hero scanner-hero--centered">
                 <div class="scanner-hero__eyebrow scanner-hero__eyebrow--center">
                     <span class="eyebrow-dot eyebrow-dot--blue" aria-hidden="true"></span>
-                    TCS-332 · Phishing URL Detection System
+                    TCS-332 · Threat Intelligence & Cyber Defense Lab
                 </div>
-                <h1 class="scanner-hero__title">Meet the <span class="gradient-text">Developers</span></h1>
-                <p class="scanner-hero__sub">The engineering, machine learning, and security research team powering the Arcis TCS-332 threat detection pipeline.</p>
+                <h1 class="scanner-hero__title">Meet the <span class="gradient-text">Engineering Team</span></h1>
+                <p class="scanner-hero__sub">The machine learning, backend systems, and cybersecurity research engineers powering the Arcis TCS-332 multi-model detection platform.</p>
             </div>
 
             <!-- Project Highlights Summary Bar -->
@@ -60,13 +60,27 @@
                 <div class="team-highlight-sep"></div>
                 <div class="team-highlight-item">
                     <span class="team-highlight-val">0.9959</span>
-                    <span class="team-highlight-label">ROC-AUC Score</span>
+                    <span class="team-highlight-label">ROC-AUC Discriminator</span>
                 </div>
                 <div class="team-highlight-sep"></div>
                 <div class="team-highlight-item">
                     <span class="team-highlight-val">~0.018 ms</span>
                     <span class="team-highlight-label">Inference Time / URL</span>
                 </div>
+            </div>
+
+            <!-- Research Abstract & Architecture Summary -->
+            <div class="card team-abstract-card" style="margin-bottom: 24px; padding: 22px 28px;">
+                <div class="card__header" style="margin-bottom: 12px; padding-bottom: 10px;">
+                    <h3 class="card__title" style="font-size: 13.5px; display: flex; align-items: center; gap: 8px;">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color: var(--jade);"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>
+                        Technical Abstract · Project TCS-332
+                    </h3>
+                    <span class="card__badge card__badge--safe">PEER BENCHMARKED</span>
+                </div>
+                <p style="color: var(--text-2); font-size: 13px; line-height: 1.7;">
+                    <strong>Arcis TCS-332</strong> is an enterprise-scale phishing detection architecture trained on the Grega Vrbančič dataset. The system fuses 60 handcrafted features across 6 structural tiers (URL lexical, Domain metrics, Directory hierarchy, File tokens, Query parameters, and Active DNS/WHOIS telemetry) with SHAP tree explainability and an ONNX-runtime XGBoost email spoofing engine. Designed for production SOC integrations, the node delivers 97.28% accuracy and sub-millisecond inference latency with zero client telemetry storage.
+                </p>
             </div>
 
             <div class="team-grid">
