@@ -788,28 +788,33 @@ document.addEventListener('DOMContentLoaded', async () => {
                 }
                 if (increaseTotalEl) increaseTotalEl.textContent = '—';
             }
-            /* Ranked risk factor breakdown for URL analysis */
+            /* Ranked risk factor breakdown for URL analysis
+               Populated from risk_signals (the actual API response field).
+               top_features is not returned by the backend — use risk_signals instead. */
             const urlRankingContainer = document.getElementById('url-risk-ranking');
             if (urlRankingContainer) {
                 urlRankingContainer.innerHTML = '';
 
-                const rankedFeatures = [...(data.top_features || [])]
-                    .sort((a, b) => Math.abs(b.impact) - Math.abs(a.impact));
+                // Build a unified list from both signal directions for the combined view
+                const allUrlSignals = [
+                    ...increasingSignals.map(s => ({ ...s, direction: 'increases' })),
+                    ...decreasingSignals.map(s => ({ ...s, direction: 'decreases' }))
+                ].sort((a, b) => Math.abs(b.impact) - Math.abs(a.impact));
 
-                rankedFeatures.forEach(item => {
+                const maxImpact = Math.max(...allUrlSignals.map(s => Math.abs(s.impact)), 0.0001);
+
+                allUrlSignals.forEach(item => {
                     const label = getFriendlyFeatureName(item.feature);
                     const isRisky = item.direction === 'increases';
-                    // Normalize impact magnitude to a 0-100 bar width
-                    const maxImpact = Math.max(...rankedFeatures.map(f => Math.abs(f.impact)), 0.0001);
                     const pct = Math.round((Math.abs(item.impact) / maxImpact) * 100);
                     const tone = isRisky ? 'danger' : 'safe';
 
                     const row = document.createElement('div');
                     row.className = 'ranking-row';
                     row.innerHTML = `
-                        <div class="ranking-row__label">${label}</div>
+                        <div class="ranking-row__label">${escapeHtml(label)}</div>
                         <div class="ranking-row__bar">
-                            <div class="ranking-row__fill ranking-row__fill--${tone} fill-${pct}"></div>
+                            <div class="ranking-row__fill ranking-row__fill--${tone} w-${Math.round(pct / 5) * 5}"></div>
                         </div>
                         <div class="ranking-row__pct">${isRisky ? '+' : '−'}${pct}%</div>
                     `;
