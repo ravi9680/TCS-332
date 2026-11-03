@@ -34,6 +34,21 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
     const getApiKey = () => localStorage.getItem('arcis_api_key') || _apiKey;
 
+    /* ── Last Analyzed Data Store for Forensic Actions ──────── */
+    let lastAnalyzedUrlData = null;
+    let lastAnalyzedEmailData = null;
+
+    async function computeSha256(str) {
+        try {
+            const buffer = new TextEncoder().encode(str);
+            const hashBuffer = await crypto.subtle.digest('SHA-256', buffer);
+            const hashArray = Array.from(new Uint8Array(hashBuffer));
+            return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+        } catch {
+            return '—';
+        }
+    }
+
     /* ── URL Scanner elements ──────────────────────────────── */
     const form          = document.getElementById('analyze-form');
     const urlInput      = document.getElementById('url-input');
@@ -495,6 +510,21 @@ document.addEventListener('DOMContentLoaded', async () => {
             }
 
             const data = await res.json();
+            lastAnalyzedUrlData = data;
+
+            /* Populate Forensic Meta */
+            const targetUrlEl = document.getElementById('forensic-target-url');
+            if (targetUrlEl) {
+                targetUrlEl.textContent = data.url;
+                targetUrlEl.title = data.url;
+            }
+            const shaEl = document.getElementById('forensic-sha256');
+            if (shaEl) {
+                computeSha256(data.url).then(h => {
+                    shaEl.textContent = h.slice(0, 16) + '…';
+                    shaEl.title = h;
+                });
+            }
 
             /* Show results */
             resultsPanel.classList.remove('hidden');
@@ -874,6 +904,16 @@ document.addEventListener('DOMContentLoaded', async () => {
             }
 
             const data = await res.json();
+            lastAnalyzedEmailData = data;
+
+            /* Populate Forensic Meta */
+            const targetEmailEl = document.getElementById('forensic-target-email');
+            if (targetEmailEl) targetEmailEl.textContent = data.email;
+            const authStatusEl = document.getElementById('forensic-email-auth');
+            if (authStatusEl) {
+                authStatusEl.textContent = data.is_phishing ? 'FAIL / SUSPICIOUS' : 'VERIFIED LEGITIMATE';
+                authStatusEl.className = `forensic-hash-val ${data.is_phishing ? 'stat-cell__value--danger' : 'stat-cell__value--safe'}`;
+            }
 
             /* Show results */
             emailResultsPanel.classList.remove('hidden');
@@ -1077,13 +1117,212 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
     }
 
+    /* 60-Feature Real-time Filter */
+    const featureSearchInput = document.getElementById('feature-search-input');
+    if (featureSearchInput) {
+        featureSearchInput.addEventListener('input', (e) => {
+            const query = e.target.value.toLowerCase().trim();
+            document.querySelectorAll('.feature-item-row').forEach(row => {
+                const name = row.querySelector('.feature-item-name')?.textContent?.toLowerCase() || '';
+                row.style.display = (!query || name.includes(query)) ? '' : 'none';
+            });
+            document.querySelectorAll('.feature-category-box').forEach(cat => {
+                const visibleRows = cat.querySelectorAll('.feature-item-row:not([style*="display: none"])');
+                cat.style.display = visibleRows.length > 0 ? '' : 'none';
+            });
+        });
+    }
+
+    /* ════════════════════════════════════════════════════════
+       ENTERPRISE FORENSIC EXPORTS & SHORTCUTS
+       ════════════════════════════════════════════════════════ */
+
+    function downloadJsonFile(filename, data) {
+        const jsonStr = typeof data === 'string' ? data : JSON.stringify(data, null, 2);
+        const blob = new Blob([jsonStr], { type: 'application/json' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = filename;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+    }
+
+    // Copy URL JSON button
+    const copyUrlJsonBtn = document.getElementById('copy-url-json-btn');
+    if (copyUrlJsonBtn) {
+        copyUrlJsonBtn.addEventListener('click', async () => {
+            if (!lastAnalyzedUrlData) {
+                showError("No scan data available to copy.");
+                return;
+            }
+            try {
+                await navigator.clipboard.writeText(JSON.stringify(lastAnalyzedUrlData, null, 2));
+                showSuccess("Analysis JSON copied to clipboard");
+            } catch {
+                showError("Failed to copy JSON to clipboard");
+            }
+        });
+    }
+
+    // Download URL report button
+    const downloadUrlReportBtn = document.getElementById('download-url-report-btn');
+    if (downloadUrlReportBtn) {
+        downloadUrlReportBtn.addEventListener('click', () => {
+            if (!lastAnalyzedUrlData) {
+                showError("No scan data available to download.");
+                return;
+            }
+            const safeDomain = (lastAnalyzedUrlData.url || 'target').replace(/[^a-zA-Z0-9]/g, '_');
+            downloadJsonFile(`arcis-threat-report-${safeDomain}-${Date.now()}.json`, lastAnalyzedUrlData);
+            showSuccess("Threat telemetry report downloaded");
+        });
+    }
+
+    // Copy Email JSON button
+    const copyEmailJsonBtn = document.getElementById('copy-email-json-btn');
+    if (copyEmailJsonBtn) {
+        copyEmailJsonBtn.addEventListener('click', async () => {
+            if (!lastAnalyzedEmailData) {
+                showError("No email scan data available to copy.");
+                return;
+            }
+            try {
+                await navigator.clipboard.writeText(JSON.stringify(lastAnalyzedEmailData, null, 2));
+                showSuccess("Email analysis JSON copied to clipboard");
+            } catch {
+                showError("Failed to copy JSON to clipboard");
+            }
+        });
+    }
+
+    // Download Email report button
+    const downloadEmailReportBtn = document.getElementById('download-email-report-btn');
+    if (downloadEmailReportBtn) {
+        downloadEmailReportBtn.addEventListener('click', () => {
+            if (!lastAnalyzedEmailData) {
+                showError("No email scan data available to download.");
+                return;
+            }
+            const safeSender = (lastAnalyzedEmailData.email || 'sender').replace(/[^a-zA-Z0-9]/g, '_');
+            downloadJsonFile(`arcis-email-report-${safeSender}-${Date.now()}.json`, lastAnalyzedEmailData);
+            showSuccess("Email threat report downloaded");
+        });
+    }
+
+    // Topbar Export Audit Logs
+    const topbarExportBtn = document.getElementById('topbar-export-btn');
+    if (topbarExportBtn) {
+        topbarExportBtn.addEventListener('click', () => {
+            const auditPayload = {
+                platform: "Arcis Threat Intelligence",
+                node: "US-EAST-1",
+                engine: "LightGBM 60-Feature + XGBoost ONNX",
+                exported_at: new Date().toISOString(),
+                total_audited_scans: scanHistory.length,
+                records: scanHistory
+            };
+            downloadJsonFile(`arcis-audit-log-${Date.now()}.json`, auditPayload);
+            showSuccess(`Exported ${scanHistory.length} audit records.`);
+        });
+    }
+
+    // Email Presets
+    const emailPresetCorp = document.getElementById('email-preset-corp');
+    if (emailPresetCorp) {
+        emailPresetCorp.addEventListener('click', () => {
+            emailSenderInput.value = "billing@microsoft.com";
+            emailReplyInput.value = "";
+            emailSubjectInput.value = "Your Microsoft 365 Cloud Subscription Invoice";
+            emailBodyInput.value = "Dear Customer,\n\nPlease find attached your monthly Microsoft 365 enterprise billing statement. Thank you for your continued partnership.\n\nBest regards,\nMicrosoft Cloud Billing Team";
+            emailSpfSelect.value = "pass";
+            emailDkimSelect.value = "pass";
+            emailDmarcSelect.value = "pass";
+            emailSenderInput.focus();
+        });
+    }
+
+    const emailPresetSpoof = document.getElementById('email-preset-spoof');
+    if (emailPresetSpoof) {
+        emailPresetSpoof.addEventListener('click', () => {
+            emailSenderInput.value = "paypal-security-verification@gmail.com";
+            emailReplyInput.value = "phisher@evil-stealth.ru";
+            emailSubjectInput.value = "URGENT: Your account has been temporarily restricted";
+            emailBodyInput.value = "Dear User,\n\nWe detected suspicious activity on your PayPal wallet. You must confirm your identity immediately or your funds will be frozen within 24 hours:\n\nhttp://paypal-verification-account-security-update.com/login.php\n\nFailure to act now will lead to permanent suspension.";
+            emailSpfSelect.value = "none";
+            emailDkimSelect.value = "none";
+            emailDmarcSelect.value = "fail";
+            emailSenderInput.focus();
+        });
+    }
+
+    const emailPresetMismatch = document.getElementById('email-preset-mismatch');
+    if (emailPresetMismatch) {
+        emailPresetMismatch.addEventListener('click', () => {
+            emailSenderInput.value = "support@apple.com";
+            emailReplyInput.value = "harvest@stealth-inbox.com";
+            emailSubjectInput.value = "Apple ID Password Reset Requested";
+            emailBodyInput.value = "We received a request to change your Apple ID password. If you did not make this request, verify your account credentials immediately at http://appleid-security-auth.servehttp.com/verify to cancel.";
+            emailSpfSelect.value = "fail";
+            emailDkimSelect.value = "fail";
+            emailDmarcSelect.value = "none";
+            emailSenderInput.focus();
+        });
+    }
+
+    // Global Keyboard Shortcut: ⌘K or / to focus search
+    document.addEventListener('keydown', (e) => {
+        if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === 'k') {
+            e.preventDefault();
+            const activeInput = document.querySelector('.tab-pane:not(.hidden) input[type="text"], .tab-pane:not(.hidden) input[type="email"]');
+            if (activeInput) {
+                activeInput.focus();
+                activeInput.select();
+            }
+        } else if (e.key === '/' && document.activeElement.tagName !== 'INPUT' && document.activeElement.tagName !== 'TEXTAREA') {
+            e.preventDefault();
+            const activeInput = document.querySelector('.tab-pane:not(.hidden) input[type="text"], .tab-pane:not(.hidden) input[type="email"]');
+            if (activeInput) {
+                activeInput.focus();
+                activeInput.select();
+            }
+        }
+    });
+
+    // Real-time Node Telemetry Ping
+    async function updateNodeTelemetry() {
+        const statusLabel = document.querySelector('#node-status-pill .node-status__label');
+        if (!statusLabel) return;
+        const t0 = performance.now();
+        try {
+            const res = await fetch(`${API_BASE}/api/health`, { method: 'GET' });
+            if (res.ok) {
+                const roundtrip = Math.round(performance.now() - t0);
+                statusLabel.textContent = `US-EAST-1 · ONLINE · ${roundtrip}ms`;
+            }
+        } catch {
+            statusLabel.textContent = `US-EAST-1 · STANDALONE`;
+        }
+    }
+    updateNodeTelemetry();
+
     /* ════════════════════════════════════════════════════════
        UTILITY
        ════════════════════════════════════════════════════════ */
 
+    function showSuccess(message) {
+        const toast = document.createElement('div');
+        toast.className = 'toast toast--success';
+        toast.textContent = message;
+        document.body.appendChild(toast);
+        setTimeout(() => toast.remove(), 4000);
+    }
+
     function showError(message) {
         const toast = document.createElement('div');
-        toast.className = 'toast';
+        toast.className = 'toast toast--error';
         toast.textContent = message;
         document.body.appendChild(toast);
         setTimeout(() => toast.remove(), 6000);

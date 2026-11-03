@@ -29,14 +29,28 @@
                 <div class="brand-logo">
                     <img src="icon.svg" width="28" height="28" alt="Arcis logo" aria-hidden="true">
                 </div>
-                <span class="brand-name">Arcis</span>
-                <span class="brand-badge">TCS-332</span>
+                <div class="brand-info">
+                    <span class="brand-name">Arcis</span>
+                    <span class="brand-badge">ENTERPRISE SOC · TCS-332</span>
+                </div>
             </div>
 
             <div class="topbar__actions">
-                <a href="/team" class="node-status" style="text-decoration:none;" role="status">
+                <div class="node-status" id="node-status-pill" title="Arcis Inference Engine Operational (US-EAST-1)" role="status">
                     <span class="node-status__dot" aria-hidden="true"></span>
-                    <span class="node-status__label">TCS-332 · TEAM</span>
+                    <span class="node-status__label">US-EAST-1 · ONLINE</span>
+                </div>
+                <a href="/docs" target="_blank" rel="noopener noreferrer" class="topbar-btn" title="Interactive API Playground (OpenAPI / Swagger)">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
+                    <span>API Docs</span>
+                </a>
+                <button type="button" id="topbar-export-btn" class="topbar-btn" title="Export Forensic Scan History as JSON">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
+                    <span>Export Audit</span>
+                </button>
+                <a href="/team" class="topbar-btn topbar-btn--team" title="TCS-332 Engineering & Threat Research Team">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>
+                    <span>Research Team</span>
                 </a>
             </div>
         </header>
@@ -48,7 +62,10 @@
                     <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M3 8L6 11L13 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
                 </div>
                 <div class="metric-tile__body">
-                    <span class="metric-tile__value">97.28<span class="metric-unit">%</span></span>
+                    <div class="metric-tile__head">
+                        <span class="metric-tile__value">97.28<span class="metric-unit">%</span></span>
+                        <span class="metric-trend metric-trend--up">+5.88% vs baseline</span>
+                    </div>
                     <span class="metric-tile__label">Tuned LightGBM Accuracy</span>
                 </div>
             </div>
@@ -58,8 +75,11 @@
                     <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="6" stroke="currentColor" stroke-width="1.5"/><path d="M8 5V8.5L10.5 11" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
                 </div>
                 <div class="metric-tile__body">
-                    <span class="metric-tile__value">0.9959</span>
-                    <span class="metric-tile__label">ROC-AUC (PR-AUC 0.9928)</span>
+                    <div class="metric-tile__head">
+                        <span class="metric-tile__value">0.9959</span>
+                        <span class="metric-trend metric-trend--pill">PR-AUC 0.9928</span>
+                    </div>
+                    <span class="metric-tile__label">ROC-AUC Discriminator</span>
                 </div>
             </div>
             <div class="metric-divider" aria-hidden="true"></div>
@@ -68,8 +88,11 @@
                     <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M13 3L3 8L7 10L13 3Z" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/><path d="M7 10L9 13L13 3" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
                 </div>
                 <div class="metric-tile__body">
-                    <span class="metric-tile__value">~0.018<span class="metric-unit">ms</span></span>
-                    <span class="metric-tile__label">Inference Time / URL</span>
+                    <div class="metric-tile__head">
+                        <span class="metric-tile__value">~0.018<span class="metric-unit">ms</span></span>
+                        <span class="metric-trend metric-trend--pill">Sub-millisecond</span>
+                    </div>
+                    <span class="metric-tile__label">Inference Latency / Query</span>
                 </div>
             </div>
             <div class="metric-divider" aria-hidden="true"></div>
@@ -78,8 +101,11 @@
                     <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M2 4h12M2 8h12M2 12h12" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
                 </div>
                 <div class="metric-tile__body">
-                    <span class="metric-tile__value">60</span>
-                    <span class="metric-tile__label">Extracted Features (6 Tiers)</span>
+                    <div class="metric-tile__head">
+                        <span class="metric-tile__value">60</span>
+                        <span class="metric-trend metric-trend--pill">6 Tiers</span>
+                    </div>
+                    <span class="metric-tile__label">Feature Vector Extraction</span>
                 </div>
             </div>
         </section>
@@ -149,22 +175,49 @@
                                     aria-label="URL to scan"
                                     required
                                 />
+                                <div class="scan-kbd-hint" title="Press ⌘K or / to focus">
+                                    <kbd>⌘K</kbd>
+                                </div>
                                 <button type="submit" id="submit-btn" class="scan-submit-btn" aria-label="Run scan">
                                     <span class="btn-text">Scan URL</span>
                                     <span class="spinner hidden" aria-hidden="true"></span>
                                     <svg class="btn-arrow" width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden="true"><path d="M3 7h8M8 4l3 3-3 3" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
                                 </button>
                             </div>
-                            <p class="scan-hint">Quick test: 
-                                <button type="button" class="scan-example" data-url="http://paypal-verification-account-security-update.com/login.php?cmd=login">paypal-phishing</button>, 
-                                <button type="button" class="scan-example" data-url="http://chase-security-login.servehttp.com/account">chase-phishing</button>, or 
-                                <button type="button" class="scan-example" data-url="https://www.google.com">google.com</button>
-                            </p>
+                            <div class="scan-presets" aria-label="Quick test templates">
+                                <span class="scan-presets__label">SOC Presets:</span>
+                                <button type="button" class="scan-chip scan-chip--safe scan-example" data-url="https://www.google.com"><span class="chip-status"></span>[Legit] Google</button>
+                                <button type="button" class="scan-chip scan-chip--safe scan-example" data-url="https://github.com"><span class="chip-status"></span>[Legit] GitHub</button>
+                                <button type="button" class="scan-chip scan-chip--warn scan-example" data-url="https://www.paypa1.com/login"><span class="chip-status"></span>[Typosquat] paypa1.com</button>
+                                <button type="button" class="scan-chip scan-chip--danger scan-example" data-url="http://chase-security-login.servehttp.com/account"><span class="chip-status"></span>[Phish] Chase Account</button>
+                                <button type="button" class="scan-chip scan-chip--danger scan-example" data-url="http://paypal-verification-account-security-update.com/login.php?cmd=login"><span class="chip-status"></span>[Phish] PayPal Urgent</button>
+                            </div>
                         </form>
                     </div>
 
                     <!-- Results -->
                     <section id="results-section" class="results-panel hidden" aria-live="polite" aria-label="Scan results">
+                        <!-- Forensic Action Bar -->
+                        <div class="forensic-toolbar">
+                            <div class="forensic-meta">
+                                <span class="forensic-target-label">Target:</span>
+                                <span id="forensic-target-url" class="forensic-target-val">—</span>
+                                <span class="forensic-sep">·</span>
+                                <span class="forensic-hash-label">SHA-256:</span>
+                                <span id="forensic-sha256" class="forensic-hash-val">—</span>
+                            </div>
+                            <div class="forensic-actions">
+                                <button type="button" id="copy-url-json-btn" class="forensic-btn" title="Copy raw JSON analysis to clipboard">
+                                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
+                                    Copy JSON
+                                </button>
+                                <button type="button" id="download-url-report-btn" class="forensic-btn forensic-btn--primary" title="Download incident telemetry report">
+                                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
+                                    Download Report
+                                </button>
+                            </div>
+                        </div>
+
                         <div class="results-layout">
 
                             <!-- Gauge card -->
@@ -280,9 +333,13 @@
                                             <svg width="15" height="15" viewBox="0 0 15 15" fill="none"><path d="M1.5 3.5h12M1.5 7.5h12M1.5 11.5h12" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/></svg>
                                             Inspect Full 60-Feature Vector (TCS-332 Pipeline)
                                         </span>
+                                        <span class="features-drawer__badge">60 Parameters</span>
                                         <svg class="features-drawer__chevron" width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M3 5l4 4 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
                                     </div>
                                     <div class="features-drawer__content" id="features-drawer-body">
+                                        <div class="feature-search-wrap">
+                                            <input type="text" id="feature-search-input" class="feature-search-input" placeholder="🔍  Filter 60 features (e.g. qty_dot, domain, asn, response)..." autocomplete="off" spellcheck="false">
+                                        </div>
                                         <div class="feature-category-grid" id="feature-category-grid">
                                             <!-- Dynamically populated with all 6 categories -->
                                         </div>
@@ -360,6 +417,13 @@
                             </div>
                         </div>
 
+                        <div class="scan-presets scan-presets--email" aria-label="Quick test templates">
+                            <span class="scan-presets__label">Email Presets:</span>
+                            <button type="button" class="scan-chip scan-chip--safe" id="email-preset-corp"><span class="chip-status"></span>[Legit] Microsoft Invoice</button>
+                            <button type="button" class="scan-chip scan-chip--danger" id="email-preset-spoof"><span class="chip-status"></span>[Phish] PayPal Free-Domain</button>
+                            <button type="button" class="scan-chip scan-chip--warn" id="email-preset-mismatch"><span class="chip-status"></span>[Spoof] Reply-To Mismatch</button>
+                        </div>
+
                         <button type="submit" id="email-submit-btn" class="email-submit-btn">
                             <span class="btn-text">Analyze Email Risk</span>
                             <span class="spinner hidden" aria-hidden="true"></span>
@@ -369,6 +433,27 @@
 
                     <!-- Email results -->
                     <section id="email-results-section" class="results-panel hidden" aria-live="polite" aria-label="Email analysis results">
+                        <!-- Forensic Action Bar -->
+                        <div class="forensic-toolbar">
+                            <div class="forensic-meta">
+                                <span class="forensic-target-label">Sender:</span>
+                                <span id="forensic-target-email" class="forensic-target-val">—</span>
+                                <span class="forensic-sep">·</span>
+                                <span class="forensic-hash-label">Auth Status:</span>
+                                <span id="forensic-email-auth" class="forensic-hash-val">—</span>
+                            </div>
+                            <div class="forensic-actions">
+                                <button type="button" id="copy-email-json-btn" class="forensic-btn" title="Copy raw JSON analysis to clipboard">
+                                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
+                                    Copy JSON
+                                </button>
+                                <button type="button" id="download-email-report-btn" class="forensic-btn forensic-btn--primary" title="Download incident telemetry report">
+                                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
+                                    Download Report
+                                </button>
+                            </div>
+                        </div>
+
                         <div class="results-layout">
 
                             <div class="card card--gauge">
