@@ -634,11 +634,22 @@ def predict_url(url: str) -> dict:
     # cannot tell you whether THIS input's value pushed the prediction
     # toward phishing or away from it).
     shap_values = shap_explainer.shap_values(scaled_df)
-    if isinstance(shap_values, list):
-        # Binary classifiers sometimes return [class_0_shap, class_1_shap]
+    # SHAP >= 0.45 changed the output format for LightGBM binary classifiers:
+    # it now returns a list of ndarrays [class_0_vals, class_1_vals].
+    # Older versions returned a single ndarray or a 3-D ndarray.
+    # Always extract the class-1 (phishing) SHAP values robustly.
+    if isinstance(shap_values, list) and len(shap_values) == 2:
+        # New format: list of [class_0_shap_rows, class_1_shap_rows]
         contributions = shap_values[1][0]
+    elif isinstance(shap_values, np.ndarray) and shap_values.ndim == 3:
+        # Old 3-D format: (n_samples, n_features, n_classes)
+        contributions = shap_values[0, :, 1]
+    elif isinstance(shap_values, list) and len(shap_values) > 0:
+        # Single-element list fallback
+        contributions = shap_values[0][0] if shap_values[0].ndim > 1 else shap_values[0]
     else:
-        contributions = shap_values[0]
+        # Flat array — treat as class-1 contributions directly
+        contributions = shap_values[0] if hasattr(shap_values, 'ndim') and shap_values.ndim > 1 else shap_values
 
     # Split ALL features into risk-increasing vs risk-decreasing groups.
     # total_influence sums every feature in that direction (not just the
